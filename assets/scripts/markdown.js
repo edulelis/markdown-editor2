@@ -10,8 +10,25 @@
           "link",
           {
         		name: "image",
-            action: function(editor) {
-      			     wp.media.frame.open();
+            action: function() {
+
+        			if ( frame ) {
+						frame.open();
+						return;
+					}
+
+					var frame = wp.media.frames.items = wp.media({
+						multiple: false
+					});
+
+					frame.on('select', function() {
+							var attachment = frame.state().get( 'selection' ).first();
+							simplemde.codemirror.replaceSelection('![' +  attachment.attributes.alt + ']('+ attachment.attributes.url +' "' + attachment.attributes.title +'")');
+						}
+					);
+
+					frame.open();
+
       			},
       			className: "fa fa-picture-o",
       			title: "Add image",
@@ -64,20 +81,20 @@
 					wp.media.editor.insert = function( html ) {
 						original_wp_media_editor_insert( html );
 						simplemde.codemirror.replaceSelection( html );
-					}
+					};
 
-          wp.media.editor.add('content').on('insert',function(n){
-            simplemde.codemirror.focus();
-          });
+					/*wp.media.editor.add('content').on('insert',function(n){
+						simplemde.codemirror.focus();
+					});*/
 
-				} );
+				});
 			}
 
         simplemde.codemirror.on("refresh", function(){
             if(simplemde.isFullscreenActive()) {
-                $('body').addClass('mde-fullscreen');
+                jQuery('body').addClass('mde-fullscreen');
             } else {
-                $('body').removeClass('mde-fullscreen');
+                jQuery('body').removeClass('mde-fullscreen');
             }
         });
 
